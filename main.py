@@ -104,7 +104,12 @@ class MainHandler(webapp2.RequestHandler):
 				user_month, user_day, user_year)
 			# We've used our error message!
 		else:
-			self.response.out.write("Thanks!  That's a totally valid day!")
+			self.redirect("/thanks")
 
-app = webapp2.WSGIApplication([('/', MainHandler)],
+class ThanksHandler(webapp2.RequestHandler):
+	def get(self):
+		self.response.out.write("Thanks! That's a totally valid day!")
+
+app = webapp2.WSGIApplication([('/', MainHandler),
+	('/thanks', ThanksHandler)],
 	debug=True)
