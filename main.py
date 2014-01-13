@@ -14,102 +14,60 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+import os
 import webapp2
-import cgi
+import jinja2
 
-months = ['January',
-	'February',
-	'March',
-	'April',
-	'May',
-	'June',
-	'July',
-	'August',
-	'September',
-	'October',
-	'November',
-	'December']
+from google.appengine.ext import db
 
-month_abbvs = dict((m[:3].lower(), m) for m in months)
+template_dir = os.path.join(os.path.dirname(__file__), 'templates')
+jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),
+	autoescape = True)
+# autoescape = True is really convenient
+# it means any html we instert into the template as a variable will be escaped automatically!
+# there is a way to avoid this if you want, but this way the default is "safe"
 
-def valid_month(month):
-	if month:
-		short_month = month[:3].lower()
-		return month_abbvs.get(short_month)
+class Handler(webapp2.RequestHandler):
+	def write(self, *a, **kw):
+		self.response.out.write(*a, **kw)
 
-def valid_day(day):
-	if day and day.isdigit():
-		day = int(day)
-		if day > 0 and day <= 31:
-			return day
+	def render_str(self, template, **params):
+		t = jinja_env.get_template(template)
+		return t.render(params)
 
-def valid_year(year):
-	if year and year.isdigit():
-		year = int(year)
-		if year > 1900 and year < 2020:
-			return year
+	def render(self, template, **kw):
+		self.write(self.render_str(template, **kw))
 
-def escape_html(s):
-	return cgi.escape(s, quote = True)
+# In this framework you can simply create tables like this
+# This is us creating the 'Art' table
+class Art(db.Model):
+	# db.Model is included from Google App Engine
+	# it let's us work with entities
+	title = db.StringProperty(required = True)
+	art = db.TextProperty(required = True)
+	created = db.DateTimeProperty(auto_now_add = True)
 
-form = """
-<form method="post">
-	What is your birthday?
-	<br>
-	
-	<label> Month
-		<input type="text" name="month" value="%(month)s">
-	</label>
-	
-	<label> Day
-		<input type="text" name="day" value="%(day)s">
-	</label>
-
-	<label> Year
-		<input type="text" name="year" value="%(year)s">
-	</label>
-
-	<div style="color: red">%(error)s</div>
-
-	<br>
-	<br>
-	<input type="submit">
-</form>
-"""
-
-class MainHandler(webapp2.RequestHandler):
-	def write_form(self, error="", month="", day="", year=""):
-	# We will be calling this instead of:
-	# self.response.out.write(form)
-	# Because it let's us substitute in error messages
-		self.response.out.write(form % {"error": error,
-			"month": escape_html(month),
-			"day": escape_html(day),
-			"year": escape_html(year)})
+class MainPage(Handler):
+	def render_front(self, title="", art="", error=""):
+		arts = db.GqlQuery("SELECT * FROM Art ORDER BY created DESC")
+		self.render("front.html", title=title, art=art, error=error, arts=arts)
 
 	def get(self):
-		self.write_form()
+		self.render_front()
 
 	def post(self):
-		user_month = self.request.get('month')
-		user_day = self.request.get('day')
-		user_year = self.request.get('year')
+		title = self.request.get("title")
+		art = self.request.get("art")
 
-		month = valid_month(user_month)
-		day = valid_day(user_day)
-		year = valid_year(user_year)
+		if title and art:
+			a = Art(title = title, art = art)
+			a.put()
 
-		if not (month and day and year):
-			self.write_form("That doesn't look valid to me, friend.",
-				user_month, user_day, user_year)
-			# We've used our error message!
+			self.redirect("/")
+			# This is just to ignore those annoying "resubmit form" errors
 		else:
-			self.redirect("/thanks")
+			error = "we need both a title and some artwork!"
+			self.render_front(title, art, error)
 
-class ThanksHandler(webapp2.RequestHandler):
-	def get(self):
-		self.response.out.write("Thanks! That's a totally valid day!")
-
-app = webapp2.WSGIApplication([('/', MainHandler),
-	('/thanks', ThanksHandler)],
+app = webapp2.WSGIApplication([('/', MainPage)],
 	debug=True)
