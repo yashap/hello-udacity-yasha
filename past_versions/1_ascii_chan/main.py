@@ -52,18 +52,24 @@ class Art(db.Model):
 	art = db.TextProperty(required = True)
 	created = db.DateTimeProperty(auto_now_add = True)
 	# so in the entity we'll store the title, art and created date for every entry
-	# title and art are String, created is a DateTime
+	# title and art are String, created is DateTime
+	# required = True means you must have a title/art
+	# auto_now_add = True means we automatically get a timestamp
 
 class MainPage(Handler):
 	# we'll be rendering the front page from both the get and post methods
 	# give it its own method to prevent duplication!
 	def render_front(self, title="", art="", error=""):
-	# didn't put the template as an input, since we'll always use this method for a specific template
+	# didn't use the template as an input for this method, since we'll always use this method for front.html
 	# basically it will put the proper title/art/error (if applicable) into the template, then render the template into a string
 		arts = db.GqlQuery("SELECT * FROM Art ORDER BY created DESC")
+		# first we query our db for all Art, and save it as the arts variable
+		# note that arts is a CURSOR
 		self.render("front.html", title=title, art=art, error=error, arts=arts)
-		# so this is just taking the title/art/error values that we're passing into the method, and letting us use them in the template
-		# for example, to use the title variable in the template, we just put {{title}} in the template where we want it substituted
+		# so this is taking the title/art/error values that we're passing into the method, and letting us use them in the template
+		# 	for example, to use the title variable in the template, we just put {{title}} in the template where we want it substituted
+		# It's also letting us use the arts curson
+		# 	See the template, but we can actually loop through this cursor in jinja!
 
 	def get(self):
 	# so when we receive a get request, we'll call the render_front method (defined above)
@@ -76,8 +82,11 @@ class MainPage(Handler):
 
 		# basic error handling
 		if title and art:
+			# So if they gave us good imput, make a new Art record!
 			a = Art(title = title, art = art)
+			# Note we don't need created
 			a.put()
+			# this will store the new Art instance in the db
 
 			self.redirect("/")
 			# This is just to ignore those annoying "resubmit form" errors

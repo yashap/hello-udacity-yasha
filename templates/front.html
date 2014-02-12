@@ -8,6 +8,7 @@
 		body {
 			font-family: sans-serif;
 			width: 800px;
+			margin: 0 auto;
 			padding: 10px;
 		}
 		.error {
@@ -51,6 +52,7 @@
 <body>
 	<h1>/ascii/</h1>
 
+	<!-- submit ascii art -->
 	<form method="post">
 		<label>
 			<div>title</div>
@@ -69,15 +71,20 @@
 
 		<input type="submit">
 	</form>
+	<!-- /submit ascii art -->
 
 	<hr>
 
+	<!-- display ascii art -->
+	<!-- the below is how to insert Python into jinja -->
 	{% for art in arts %}
 		<div class="art">
 			<div class="art-title">{{art.title}}</div>
 			<pre class="art-body">{{art.art}}</pre>
+			<!-- <pre> means pre-formatted text, i.e. preserve whitespace -->
 		</div>
 	{% endfor %}
+	<!-- /display ascii art -->
 
 </body>
 </html>
