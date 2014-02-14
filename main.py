@@ -66,15 +66,24 @@ class AdminHandler(Handler):
 			# if they post good imput, then create a new db record (note that created doesn't have to be entered)
 			e = BlogPosts(subject=subject, content=content)
 			e.put()
+			this_id = e.key().id()
 
-			self.redirect("/")
+			self.redirect("/%d" % this_id)
+
 		else:
 			error = "we need both a subject and a blog post!"
 			self.render_blog(subject, content, error)
 
+# Handler for permalinks to individual posts
+class Permalink(BlogHandler):
+	def get(self, blog_id):
+		this_post = BlogPosts.get_by_id(int(blog_id))
+		self.render("blog.html", currentPosts = [this_post])
+
 # Defines what class to handle requests related to each url
 app = webapp2.WSGIApplication([
 		('/', BlogHandler),
-		('/newpost', AdminHandler)
+		('/newpost', AdminHandler),
+		('/(\d+)', Permalink)
 	],
 	debug=True)
