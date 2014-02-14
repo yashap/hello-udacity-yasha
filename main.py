@@ -44,7 +44,7 @@ class BlogPosts(db.Model):
 # Handler for the page displaying posts
 class BlogHandler(Handler):
 	def render_blog(self, subject="", content="", created="", error=""):
-		currentPosts = db.GqlQuery("SELECT * FROM BlogPosts ORDER BY created DESC")
+		currentPosts = db.GqlQuery("SELECT * FROM BlogPosts ORDER BY created DESC LIMIT 10")
 		self.render("blog.html", subject=subject, content=content, error=error, currentPosts=currentPosts)
 
 	def get(self):
@@ -66,24 +66,31 @@ class AdminHandler(Handler):
 			# if they post good imput, then create a new db record (note that created doesn't have to be entered)
 			e = BlogPosts(subject=subject, content=content)
 			e.put()
-			this_id = e.key().id()
+			this_id = str(e.key().id())
 
-			self.redirect("/%d" % this_id)
+			self.redirect("/%s" % this_id)
 
 		else:
-			error = "we need both a subject and a blog post!"
+			error = "We need both a subject and a blog post!"
 			self.render_blog(subject, content, error)
 
 # Handler for permalinks to individual posts
 class Permalink(BlogHandler):
-	def get(self, blog_id):
-		this_post = BlogPosts.get_by_id(int(blog_id))
+	def get(self, post_id):
+		this_post = BlogPosts.get_by_id(int(post_id))
+
+		if not this_post:
+			self.error(404)
+			return
+
 		self.render("blog.html", currentPosts = [this_post])
 
 # Defines what class to handle requests related to each url
 app = webapp2.WSGIApplication([
 		('/', BlogHandler),
 		('/newpost', AdminHandler),
-		('/(\d+)', Permalink)
+		('/([0-9]+)', Permalink)
+		# The () mean this part should be passed as a parameter to our handler
+		# The [0-9]+ part is a regular expression.  [0-9] means any digit, + means 1 or more
 	],
 	debug=True)
