@@ -48,7 +48,24 @@ class BlogHandler(Handler):
 		self.render("blog.html", subject=subject, content=content, error=error, currentPosts=currentPosts)
 
 	def get(self):
-		self.render_blog()
+		# self.render_blog()
+		# app engine automatically parses cookies, and throws them into a dictionary-like object, "cookies"
+		# we can call the dict-version of get on it:
+		visits = self.request.cookies.get('visits', 0)
+		# get's the value of 'visits' if it's there, else 0
+		# So if I've never if I've never been here before, this starts at 0
+		# Now increment:
+		if visits.isdigit():
+			visits = int(visits) + 1
+		else:
+			visits = 0
+		# Now set this in the cookie:
+		self.response.headers.add_header('Set-Cookie', 'visits=%s' % str(visits))
+		# Now use it
+		if visits > 25:
+			self.write("You are the best ever!")
+		else:
+			self.write("You've been %s times!" % visits)
 
 # Handler for the page to submit posts
 class AdminHandler(Handler):

@@ -24,15 +24,27 @@ input[type=submit] {
 hr {
 	margin: 20px auto;
 }
+.main-title {
+	text-decoration: none;
+	color: black;
+	font-size: 40px;
+	margin: 10px 0 20px 0;
+	display: inline-block;
+}
+.main-title:hover {
+	text-decoration: none;
+	color: gray;
+}
 .entry + .entry {
 	margin-top: 20px;
 }
 .entry-title {
-	font-weight: bold;
 	font-size: 20px;
+	font-weight: bold;
 }
 .entry-created {
 	text-align: right;
+	color: gray;
 }
 .entry-body {
 	margin: 0;
