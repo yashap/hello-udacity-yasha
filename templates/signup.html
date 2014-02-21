@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+	<title>Yasha's Blog</title>
+	<!-- Bootstrap core CSS -->
+	<link rel="stylesheet" href="static/css/bootstrap.min.css" type="text/css">
+	<!-- Site-wide css -->
+	<link rel="stylesheet" href="static/css/styles.css" type="text/css">
+</head>
+
+<body>
+	<div class="container">
+
+		<a class="main-title" href="/">Yasha's Blog</a>
+		<hr>
+
+		<div class="error">{{error}}</div>
+
+		<form method="post">
+			<label>
+				<div>User Name</div>
+				<input type="text" name="username" value="{{username}}">
+			</label>
+
+			<label>
+				<div>Password</div>
+				<input type="password" name="password" value="{{password}}">
+			</label>
+
+			<label>
+				<div>Verify Password</div>
+				<input type="password" name="verify" value="{{verify}}">
+			</label>
+
+			<label>
+				<div>Email</div>
+				<input type="text" name="verify" value="{{email}}">
+			</label>
+
+			<input type="submit">
+		</form>
+
+	</div><!-- /.container -->
+
+	<!-- JavaScript -->
+	<!-- jQuery -->
+	<script src="static/js/jquery-1.10.2.min.js"></script>
+	<!-- Bootstrap core JS -->
+	<script src="static/js/bootstrap.min.js"></script>
+</body>
+</html>
