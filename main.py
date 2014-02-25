@@ -147,11 +147,23 @@ class SignupHandler(Handler):
 	def get(self):
 		self.render_page()
 
+	def checkUser(self, user):
+		# Read up on Google data store:
+		# https://developers.google.com/appengine/docs/python/ndb/
+		this_query = "SELECT * FROM Members WHERE username = '%s'" % user
+		this_user = db.GqlQuery(this_query)
+		if this_user[0].username:
+			return this_user[0].username
+		else:
+			return None
+
 	def post(self):
 		username = self.request.get("username")
 		password = self.request.get("password")
 		verify = self.request.get("verify")
 		email = self.request.get("email")
+
+		user_in_db = self.checkUser(username)
 
 		if not username or not password or not verify:
 			error = "Please enter a user name and password."
@@ -161,7 +173,9 @@ class SignupHandler(Handler):
 			error = "Your password and verification password were not the same."
 			self.render_page(username, password, verify, email, error)
 
-		# check to see if this user is already in db
+		elif user_in_db:
+			error = "This user name has already regisitered for an account."
+			self.render_page(username, password, verify, email, error)
 
 		else:
 			e = Members(username=username, password=password, email=email)
