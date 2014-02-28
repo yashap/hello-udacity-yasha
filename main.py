@@ -66,6 +66,7 @@ class Members(db.Model):
 ###############################
 
 # General Handler class, that specific handlers will inherit from
+###############################
 class Handler(webapp2.RequestHandler):
 	def write(self, *a, **kw):
 		self.response.out.write(*a, **kw)
@@ -78,6 +79,7 @@ class Handler(webapp2.RequestHandler):
 		self.write(self.render_str(template, **kw))
 
 # Handler for the page displaying posts
+###############################
 class BlogHandler(Handler):
 	def render_blog(self, subject="", content="", created="", error=""):
 		currentPosts = db.GqlQuery("SELECT * FROM BlogPosts ORDER BY created DESC LIMIT 10")
@@ -85,26 +87,9 @@ class BlogHandler(Handler):
 
 	def get(self):
 		self.render_blog()
-		# self.response.headers['Content-Type'] = 'text/plain'
-		# visits = 0
-		# visits_cookie_str = self.request.cookies.get('visits')
-		# if visits_cookie_str:
-		# 	cookie_val = check_secure_val(visits_cookie_str)
-		# 	if cookie_val:
-		# 		visits = int(cookie_val)
-
-		# visits += 1
-
-		# new_cookie_val = make_secure_val(str(visits))
-
-		# self.response.headers.add_header('Set-Cookie', 'visits=%s' % new_cookie_val)
-
-		# if visits > 25:
-		# 	self.write("You are the best ever!")
-		# else:
-		# 	self.write("You've been %s times!" % visits)
 
 # Handler for the page to submit posts
+###############################
 class AdminHandler(Handler):
 	def render_page(self, subject="", content="", error=""):
 		self.render("post.html", subject=subject, content=content, error=error)
@@ -129,6 +114,7 @@ class AdminHandler(Handler):
 			self.render_page(subject, content, error)
 
 # Handler for permalinks to individual posts
+###############################
 class Permalink(BlogHandler):
 	def get(self, post_id):
 		this_post = BlogPosts.get_by_id(int(post_id))
@@ -140,6 +126,7 @@ class Permalink(BlogHandler):
 		self.render("blog.html", currentPosts = [this_post])
 
 # Handler for the signup page
+###############################
 class SignupHandler(Handler):
 	def render_page(self, username="", password="", verify="", email="", error=""):
 		self.render("signup.html", username=username, password=password, verify=verify, email=email, error=error)
@@ -150,10 +137,10 @@ class SignupHandler(Handler):
 	def checkUser(self, user):
 		# Read up on Google data store:
 		# https://developers.google.com/appengine/docs/python/ndb/
-		this_query = "SELECT * FROM Members WHERE username = '%s'" % user
-		this_user = db.GqlQuery(this_query)
-		if this_user[0].username:
-			return this_user[0].username
+		q = db.GqlQuery("SELECT * FROM Members WHERE username = :1", user)
+		this_user = q.get()
+		if this_user:
+			return this_user
 		else:
 			return None
 
@@ -181,31 +168,27 @@ class SignupHandler(Handler):
 			e = Members(username=username, password=password, email=email)
 			e.put()
 
-			# cookie user here??
+			user_id = str(e.key().id())
+			user_cookie = make_secure_val(str(user_id))
+			self.response.headers.add_header('Set-Cookie', 'user=%s; Path=/' % user_cookie)
 
 			self.redirect("/welcome")
 
-		# if username and (password == verify) and email:
-		# 	# if they post good imput, then create a new db record (note that created doesn't have to be entered)
-		# 	e = BlogPosts(subject=subject, content=content)
-		# 	e.put()
-		# 	this_id = str(e.key().id())
-
-		# 	self.redirect("/%s" % this_id)
-
-		# else:
-		# 	error = "We need both a subject and a blog post!"
-		# 	self.render_page(subject, content, error)
 
 # Handler for the welcome page
+###############################
 class WelcomeHandler(Handler):
 	def get_user(self):
-		this_user = self.request.cookies.get("testing")
-		
-		if not this_user:
-			return "error"
+		user_cookie = self.request.cookies.get('user')
+		if user_cookie:
+			user_id = check_secure_val(user_cookie)
+			if user_id:
+				user = Members.get_by_id(int(user_id))
+				return user.username
+			else:
+				self.redirect("/signup")
 		else:
-			return this_user
+			self.redirect("/signup")
 
 	def get(self):
 		username = self.get_user()
