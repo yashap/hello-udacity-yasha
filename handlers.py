@@ -82,7 +82,7 @@ class NewPostHandler(Handler):
 		if self.user:
 			self.render("newpost.html")
 		else:
-			self.redirect("/login")
+			self.redirect("/blog/login")
 
 	def post(self):
 		if self.user:
@@ -102,7 +102,7 @@ class NewPostHandler(Handler):
 				self.render("newpost.html", subject=subject, content=content, error=error)
 
 		else:
-			self.redirect("/login")
+			self.redirect("/blog/login")
 
 # Handler for permalinks to individual posts
 ###############################
@@ -160,7 +160,7 @@ class SignupHandler(Handler):
 			u.put()
 
 			self.login(u)
-			self.redirect("/welcome")
+			self.redirect("/blog/welcome")
 
 
 # Handler for the welcome page

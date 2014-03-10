@@ -24,9 +24,9 @@ app = webapp2.WSGIApplication([
 		("/blog/([0-9]+)", handlers.Permalink),
 		# The () mean this part should be passed as a parameter to our handler
 		# The [0-9]+ part is a regular expression.  [0-9] means any digit, + means 1 or more
-		("/signup", handlers.SignupHandler),
-		("/login", handlers.LoginHandler),
-		("/logout", handlers.LogoutHandler),
-		("/welcome", handlers.WelcomeHandler)
+		("/blog/signup", handlers.SignupHandler),
+		("/blog/login", handlers.LoginHandler),
+		("/blog/logout", handlers.LogoutHandler),
+		("/blog/welcome", handlers.WelcomeHandler)
 	],
 	debug=True)
