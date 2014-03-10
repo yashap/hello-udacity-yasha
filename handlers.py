@@ -202,4 +202,4 @@ class LoginHandler(Handler):
 class LogoutHandler(Handler):
 	def get(self):
 			self.logout()
-			self.redirect("/blog")
+			self.redirect("/blog/signup")
