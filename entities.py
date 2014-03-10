@@ -21,7 +21,7 @@ class User(db.Model):
 	# this is a "decorator"
 	# means you can call this method on a User object
 	def by_id(cls, uid):
-		return User.get_by_id(uid, parent = functions.users_key())
+		return cls.get_by_id(uid, parent = functions.users_key())
 		# this is a convenience function to quickly get the user out of the db
 		# 	cls is very similar to self
 		# 	self refers to the instance of the class (the object)
@@ -29,7 +29,7 @@ class User(db.Model):
 		# pass the id, get the user object
 
 	@classmethod
-	def by_name(clas, name):
+	def by_name(cls, name):
 		u = db.GqlQuery("SELECT * FROM User WHERE name = :1", name).get()
 		return u
 		# pass the username, get the user object

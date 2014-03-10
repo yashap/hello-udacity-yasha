@@ -82,7 +82,7 @@ class NewPostHandler(Handler):
 		if self.user:
 			self.render("newpost.html")
 		else:
-			self.redirect("/blog/login")
+			self.redirect("/blog/signup")
 
 	def post(self):
 		if self.user:
@@ -102,7 +102,7 @@ class NewPostHandler(Handler):
 				self.render("newpost.html", subject=subject, content=content, error=error)
 
 		else:
-			self.redirect("/blog/login")
+			self.redirect("/blog/signup")
 
 # Handler for permalinks to individual posts
 ###############################
@@ -168,9 +168,9 @@ class SignupHandler(Handler):
 class WelcomeHandler(Handler):
 	def get(self):
 		if self.user:
-			self.render("welcome.html", username=self.user.name)
+			self.render("welcome.html", username = self.user.name)
 		else:
-			self.redirect("/blog")
+			self.redirect("/blog/signup")
 		# remember that the initialize function automatically checks the cookie
 		# 	if legit, stores the user object in self.user
 
@@ -193,7 +193,7 @@ class LoginHandler(Handler):
 		if u:
 			self.login(u)
 			# that sets the cookie!
-			self.redirect("/blog")
+			self.redirect("/blog/welcome")
 		else:
 			self.render("login.html", error = "Invalid login.")
 
