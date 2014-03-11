@@ -106,7 +106,7 @@ class NewPostHandler(Handler):
 
 # Handler for permalinks to individual posts
 ###############################
-class Permalink(Handler):
+class PermalinkHandler(Handler):
 	def get(self, post_id):
 		# look at how we set up the mapping
 		# 	post_id is automatically passed to the handler
@@ -116,7 +116,7 @@ class Permalink(Handler):
 			self.error(404)
 			return
 
-		self.render("blog.html", currentPosts = [this_post])
+		self.render("permalink.html", currentPosts = [this_post])
 
 # Handler for the signup page
 ###############################
