@@ -55,12 +55,13 @@ class Handler(webapp2.RequestHandler):
 			"user=; Path=/"
 		)
 		# simply set an empty cookie
+		# 	Important to set for the same path, to overwrite
 
 	def initialize(self, *a, **kw):
 		webapp2.RequestHandler.initialize(self, *a, **kw)
 		uid = self.read_secure_cookie("user")
 		self.user = uid and entities.User.by_id(int(uid))
-		# This function is automatically called by the app enginge framework
+		# This function is automatically called by the app enginge framework ON EVERY REQUEST (i.e. GET/POST)
 		# 	any handlers we have that inherit from this Handler class (i.e. all of them) will automatically be storing this user object in self.user if the user is legitimately logged in
 		# 	so it's just easy access to the user object, if the user is logged in
 		# Basically, IF the cookie is properly hashed, uid = the user id
