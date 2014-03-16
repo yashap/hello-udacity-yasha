@@ -49,7 +49,7 @@ def make_pw_hash(name, pw, salt=None):
 	if not salt:
 		salt = make_salt()
 	h = hashlib.sha256(name + pw + salt).hexdigest()
-	return "%s,%s" % (salt, h)
+	return "%s|%s" % (salt, h)
 	# if you don"t give a salt, it will return different every time
 	# 	make_pw_hash("ypodeswa","testPass")
 	# 		"tDtdD,26addd6404e3a8fd561496d6661c3308641c99edf719cd07676060a59e1b03c7"
@@ -62,7 +62,7 @@ def make_pw_hash(name, pw, salt=None):
 	# BUT it can also be used in valid_pw, to validate a user/pw combo, as we can grab the salt from the hash
 
 def valid_pw(name, pw, h):
-	salt = h.split(",")[0]
+	salt = h.split("|")[0]
 	return h == make_pw_hash(name, pw, salt)
 	# Given the username, pw and hash, tells you if it"s the valid pw for the username
 	# 	Note that you"d have to be able to pull h out of a db?
