@@ -73,7 +73,11 @@ class Handler(webapp2.RequestHandler):
 ###############################
 class BlogHandler(Handler):
 	def get(self):
-		currentPosts = entities.db.GqlQuery("SELECT * FROM BlogPost ORDER BY created DESC LIMIT 10")
+		currentPosts = entities.db.GqlQuery("SELECT * "
+			"FROM BlogPost "
+			"ORDER BY created DESC "
+			"LIMIT 10"
+			)
 		self.render("blog.html", currentPosts=currentPosts)
 
 # Handler for the page to submit posts

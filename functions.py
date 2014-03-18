@@ -52,12 +52,12 @@ def make_pw_hash(name, pw, salt=None):
 	return "%s|%s" % (salt, h)
 	# if you don"t give a salt, it will return different every time
 	# 	make_pw_hash("ypodeswa","testPass")
-	# 		"tDtdD,26addd6404e3a8fd561496d6661c3308641c99edf719cd07676060a59e1b03c7"
-	# 		"gyDWP,e0f90bf5799dba3f87da323ed9164937c2f59411f4c4cc3159ddfbbe924d56b3"
+	# 		"tDtdD|26addd6404e3a8fd561496d6661c3308641c99edf719cd07676060a59e1b03c7"
+	# 		"gyDWP|e0f90bf5799dba3f87da323ed9164937c2f59411f4c4cc3159ddfbbe924d56b3"
 	# but if you give it a salt
 	# 	make_pw_hash("ypodeswa","testPass","Salty")
-	# 		"Salty,6afd21bb3b0c725c5f1ebc1c318da527da090c74d01a2f21b09d0cbba8f5fe0d"
-	# 		"Salty,6afd21bb3b0c725c5f1ebc1c318da527da090c74d01a2f21b09d0cbba8f5fe0d"
+	# 		"Salty|6afd21bb3b0c725c5f1ebc1c318da527da090c74d01a2f21b09d0cbba8f5fe0d"
+	# 		"Salty|6afd21bb3b0c725c5f1ebc1c318da527da090c74d01a2f21b09d0cbba8f5fe0d"
 	# the idea is that this can be used to create the original pw hash, with a random salt, to store in the db
 	# BUT it can also be used in valid_pw, to validate a user/pw combo, as we can grab the salt from the hash
 
@@ -66,9 +66,9 @@ def valid_pw(name, pw, h):
 	return h == make_pw_hash(name, pw, salt)
 	# Given the username, pw and hash, tells you if it"s the valid pw for the username
 	# 	Note that you"d have to be able to pull h out of a db?
-	# valid_pw("ypodeswa","testPass","Salty,6afd21bb3b0c725c5f1ebc1c318da527da090c74d01a2f21b09d0cbba8f5fe0d")
+	# valid_pw("ypodeswa","testPass","Salty|6afd21bb3b0c725c5f1ebc1c318da527da090c74d01a2f21b09d0cbba8f5fe0d")
 	# 	True
-	# valid_pw("ypodeswa","wrongPass","Salty,6afd21bb3b0c725c5f1ebc1c318da527da090c74d01a2f21b09d0cbba8f5fe0d")
+	# valid_pw("ypodeswa","wrongPass","Salty|6afd21bb3b0c725c5f1ebc1c318da527da090c74d01a2f21b09d0cbba8f5fe0d")
 	# 	False
 
 def users_key(group = "default"):
