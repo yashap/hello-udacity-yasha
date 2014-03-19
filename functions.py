@@ -7,7 +7,9 @@ import random
 import string
 import hashlib
 import re
+import urllib2
 
+from xml.dom import minidom
 from google.appengine.ext import db
 
 # Template boilerplate
@@ -97,3 +99,28 @@ def valid_password(password):
 email_regex = re.compile(r"^[\S]+@[\S]+\.[\S]+$")
 def valid_email(email):
 	return not email or email_regex.match(email)
+
+# Google maps
+###############################
+IP_URL = "http://api.hostip.info/?ip="
+
+def get_coords(ip):
+	url = IP_URL + ip
+	xml = None
+	try:
+		xml = urllib2.urlopen(url).read()
+	except URLError:
+		return None
+
+	if xml:
+		x = minidom.parseString(xml)
+		coords = x.getElementsByTagName("gml:coordinates")
+		if coords and coords[0].childNodes[0].nodeValue:
+			lon, lat = coords[0].childNodes[0].nodeValue.split(",")
+			return db.GeoPt(lat, lon)
+
+GMAPS_URL = "http://maps.googleapis.com/maps/api/staticmap?size=500x500&sensor=false&"
+
+def gmaps_img(points):
+	markers = "&".join("markers=%s,%s" % (p.lat, p.lon) for p in points)
+	return GMAPS_URL + markers

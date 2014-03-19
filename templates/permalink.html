@@ -4,15 +4,25 @@
 
 {% block content %}
 	<a class="main-title" href="/blog">Yasha's Blog</a>
+	<hr>
 
-	{% for currentPost in currentPosts %}
-		<hr>
-		<div class="entry">
-			<div class="row">
-				<div class="col-sm-8 entry-title">{{currentPost.subject}}</div>
-				<div class="col-sm-4 entry-created">{{currentPost.created.strftime("%b %d, %Y")}}</div>
+	<div class="row">
+		<div class="col-sm-8">
+		{% for currentPost in currentPosts %}
+			<div class="entry">
+				<div class="row">
+					<div class="col-sm-8 entry-title">{{currentPost.subject}}</div>
+					<div class="col-sm-4 entry-created">{{currentPost.created.strftime("%b %d, %Y")}}</div>
+				</div>
+				<pre class="entry-body">{{currentPost.content}}</pre>
 			</div>
-			<pre class="entry-body">{{currentPost.content}}</pre>
+			<hr>
+		{% endfor %}
 		</div>
-	{% endfor %}
+		<div class="col-sm-4">
+		{% if img_url %}
+			<img class="img-responsive" src="{{img_url}}">
+		{% endif %}
+		</div>
+	</div>
 {% endblock %}

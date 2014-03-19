@@ -78,7 +78,40 @@ class BlogHandler(Handler):
 			"ORDER BY created DESC "
 			"LIMIT 10"
 			)
-		self.render("blog.html", currentPosts=currentPosts)
+
+		currentPosts = list(currentPosts)
+
+		points = []
+		for p in currentPosts:
+			if p.coords:
+				points.append(p.coords)
+
+		img_url = None
+		if points:
+			img_url = functions.gmaps_img(points)
+
+		self.render("blog.html", currentPosts=currentPosts, img_url=img_url)
+
+# Handler for permalinks to individual posts
+###############################
+class PermalinkHandler(Handler):
+	def get(self, post_id):
+		# look at how we set up the mapping
+		# 	post_id is automatically passed to the handler
+		this_post = entities.BlogPost.get_by_id(int(post_id), parent=functions.blog_key())
+
+		if not this_post:
+			self.error(404)
+			return
+
+		if this_post.coords:
+			point = this_post.coords
+
+		img_url = None
+		if point:
+			img_url = functions.gmaps_img([point])
+
+		self.render("permalink.html", currentPosts = [this_post], img_url=img_url)
 
 # Handler for the page to submit posts
 ###############################
@@ -93,10 +126,13 @@ class NewPostHandler(Handler):
 		if self.user:
 			subject = self.request.get("subject")
 			content = self.request.get("content")
+			coords = functions.get_coords(self.request.remote_addr)
 
 			if subject and content:
 				# if they entered a subject and content
 				e = entities.BlogPost(parent = functions.blog_key(), subject=subject, content=content)
+				if coords:
+					e.coords = coords
 				e.put()
 				this_id = str(e.key().id())
 
@@ -108,20 +144,6 @@ class NewPostHandler(Handler):
 
 		else:
 			self.redirect("/blog/signup")
-
-# Handler for permalinks to individual posts
-###############################
-class PermalinkHandler(Handler):
-	def get(self, post_id):
-		# look at how we set up the mapping
-		# 	post_id is automatically passed to the handler
-		this_post = entities.BlogPost.get_by_id(int(post_id), parent=functions.blog_key())
-
-		if not this_post:
-			self.error(404)
-			return
-
-		self.render("permalink.html", currentPosts = [this_post])
 
 # Handler for the signup page
 ###############################

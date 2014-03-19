@@ -9,6 +9,7 @@ class BlogPost(db.Model):
 	content = db.TextProperty(required = True)
 	created = db.DateTimeProperty(auto_now_add = True)
 	last_modified = db.DateTimeProperty(auto_now = True)
+	coords = db.GeoPtProperty()
 
 class User(db.Model):
 	name = db.StringProperty(required = True)
