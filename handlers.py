@@ -104,6 +104,7 @@ class PermalinkHandler(Handler):
 			self.error(404)
 			return
 
+		point = None
 		if this_post.coords:
 			point = this_post.coords
 
