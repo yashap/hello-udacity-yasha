@@ -8,6 +8,7 @@
 
 	<div class="row">
 		<div class="col-sm-8">
+
 		{% for currentPost in currentPosts %}
 			<div class="entry">
 				<div class="row">
@@ -18,11 +19,15 @@
 			</div>
 			<hr>
 		{% endfor %}
+
 		</div>
 		<div class="col-sm-4">
+
 		{% if img_url %}
+			<h2>Posted from</h2>
 			<img class="img-responsive" src="{{img_url}}">
 		{% endif %}
+
 		</div>
 	</div>
 {% endblock %}

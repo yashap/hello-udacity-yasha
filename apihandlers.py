@@ -1,6 +1,7 @@
 import functions
 import entities
 import handlers
+import json
 
 # Handler for the page displaying posts
 ###############################
@@ -12,18 +13,20 @@ class BlogAPI(handlers.Handler):
 			"LIMIT 10"
 			)
 
-		currentPosts = list(currentPosts)
-
-		points = []
+		data = []
 		for p in currentPosts:
-			if p.coords:
-				points.append(p.coords)
+			print p.last_modified
+			data.append({
+				"subject": p.subject, 
+				"content": p.content,
+				"created": p.created.strftime("%b %d %Y %H:%M:%S"),
+				"last_modified": p.last_modified.strftime("%b %d %Y %H:%M:%S"),
+				"coords": p.coords
+			})
 
-		img_url = None
-		if points:
-			img_url = functions.gmaps_img(points)
+		self.response.headers["Content-Type"] = "application/json; charset=UTF-8"
+		self.write(json.dumps(data))
 
-		self.render("blog.html", currentPosts=currentPosts, img_url=img_url)
 
 # Handler for permalinks to individual posts
 ###############################
@@ -37,12 +40,13 @@ class PermalinkAPI(handlers.Handler):
 			self.error(404)
 			return
 
-		point = None
-		if this_post.coords:
-			point = this_post.coords
+		data = {
+			"subject": this_post.subject, 
+			"content": this_post.content,
+			"created": this_post.created.strftime("%b %d %Y %H:%M:%S"),
+			"last_modified": this_post.last_modified.strftime("%b %d %Y %H:%M:%S"),
+			"coords": this_post.coords
+		}
 
-		img_url = None
-		if point:
-			img_url = functions.gmaps_img([point])
-
-		self.render("permalink.html", currentPosts = [this_post], img_url=img_url)
+		self.response.headers["Content-Type"] = "application/json; charset=UTF-8"
+		self.write(json.dumps(data))
