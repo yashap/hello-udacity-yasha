@@ -17,11 +17,11 @@ class BlogAPI(handlers.Handler):
 		for p in currentPosts:
 			print p.last_modified
 			data.append({
-				"subject": p.subject, 
-				"content": p.content,
-				"created": p.created.strftime("%b %d %Y %H:%M:%S"),
-				"last_modified": p.last_modified.strftime("%b %d %Y %H:%M:%S"),
-				"coords": p.coords
+				"subject": p.subject if p.subject else None,
+				"content": p.content if p.content else None,
+				"created": p.created.strftime("%b %d %Y %H:%M:%S") if p.created else None,
+				"last_modified": p.last_modified.strftime("%b %d %Y %H:%M:%S") if p.last_modified else None,
+				"coords": "%s,%s" % (p.coords.lat, p.coords.lon) if p.coords else None
 			})
 
 		self.response.headers["Content-Type"] = "application/json; charset=UTF-8"
@@ -34,18 +34,18 @@ class PermalinkAPI(handlers.Handler):
 	def get(self, post_id):
 		# look at how we set up the mapping
 		# 	post_id is automatically passed to the handler
-		this_post = entities.BlogPost.get_by_id(int(post_id), parent=functions.blog_key())
+		p = entities.BlogPost.get_by_id(int(post_id), parent=functions.blog_key())
 
-		if not this_post:
+		if not p:
 			self.error(404)
 			return
 
 		data = {
-			"subject": this_post.subject, 
-			"content": this_post.content,
-			"created": this_post.created.strftime("%b %d %Y %H:%M:%S"),
-			"last_modified": this_post.last_modified.strftime("%b %d %Y %H:%M:%S"),
-			"coords": this_post.coords
+			"subject": p.subject if p.subject else None,
+			"content": p.content if p.content else None,
+			"created": p.created.strftime("%b %d %Y %H:%M:%S") if p.created else None,
+			"last_modified": p.last_modified.strftime("%b %d %Y %H:%M:%S") if p.last_modified else None,
+			"coords": "%s,%s" % (p.coords.lat, p.coords.lon) if p.coords else None
 		}
 
 		self.response.headers["Content-Type"] = "application/json; charset=UTF-8"

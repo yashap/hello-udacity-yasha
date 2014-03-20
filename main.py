@@ -20,16 +20,17 @@ import apihandlers
 import webapp2
 
 app = webapp2.WSGIApplication([
-		("/blog", handlers.BlogHandler),
+		("/", handlers.BlogHandler),
+		("/blog/?", handlers.BlogHandler),
 		("/blog.json", apihandlers.BlogAPI),
-		("/blog/newpost", handlers.NewPostHandler),
-		("/blog/([0-9]+)", handlers.PermalinkHandler),
+		("/blog/newpost/?", handlers.NewPostHandler),
+		("/blog/([0-9]+)/?", handlers.PermalinkHandler),
 		("/blog/([0-9]+).json", apihandlers.PermalinkAPI),
 		# The () mean this part should be passed as a parameter to our handler
 		# The [0-9]+ part is a regular expression.  [0-9] means any digit, + means 1 or more
-		("/blog/signup", handlers.SignupHandler),
-		("/blog/login", handlers.LoginHandler),
-		("/blog/logout", handlers.LogoutHandler),
-		("/blog/welcome", handlers.WelcomeHandler)
+		("/blog/signup/?", handlers.SignupHandler),
+		("/blog/login/?", handlers.LoginHandler),
+		("/blog/logout/?", handlers.LogoutHandler),
+		("/blog/welcome/?", handlers.WelcomeHandler)
 	],
 	debug=True)
