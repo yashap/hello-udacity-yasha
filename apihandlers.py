@@ -13,9 +13,10 @@ class BlogAPI(handlers.Handler):
 			"LIMIT 10"
 			)
 
+		currentPosts = list(currentPosts)
 		data = []
+
 		for p in currentPosts:
-			print p.last_modified
 			data.append({
 				"subject": p.subject if p.subject else None,
 				"content": p.content if p.content else None,
