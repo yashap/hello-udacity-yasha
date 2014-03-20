@@ -25,6 +25,9 @@ class Handler(webapp2.RequestHandler):
 		self.write(self.render_str(template, **params))
 		# writes the rendered template
 
+	def render_json(self, **params):
+		
+
 	def set_secure_cookie(self, name, val):
 		cookie_val = functions.make_secure_val(val)
 		self.response.headers.add_header(
@@ -68,6 +71,11 @@ class Handler(webapp2.RequestHandler):
 		# User.by_id(int(uid)) checks the db to see if this user id is in there, and if so it returns the user object
 		# 	we store this user object in self.user
 
+		if self.request.url.endswith(".json"):
+			self.format = "json"
+		else:
+			self.format = "hmtl"
+
 
 # Handler for the page displaying posts
 ###############################
@@ -81,16 +89,20 @@ class BlogHandler(Handler):
 
 		currentPosts = list(currentPosts)
 
-		points = []
-		for p in currentPosts:
-			if p.coords:
-				points.append(p.coords)
+		if self.format == "html":
+			points = []
+			for p in currentPosts:
+				if p.coords:
+					points.append(p.coords)
 
-		img_url = None
-		if points:
-			img_url = functions.gmaps_img(points)
+			img_url = None
+			if points:
+				img_url = functions.gmaps_img(points)
 
-		self.render("blog.html", currentPosts=currentPosts, img_url=img_url)
+			self.render("blog.html", currentPosts=currentPosts, img_url=img_url)
+
+		elif self.format = "json":
+
 
 # Handler for permalinks to individual posts
 ###############################

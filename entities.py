@@ -11,6 +11,15 @@ class BlogPost(db.Model):
 	last_modified = db.DateTimeProperty(auto_now = True)
 	coords = db.GeoPtProperty()
 
+	def as_dict(self):
+		time_fmt = "%c"
+		d = {"subject": self.subject if self.subject else None,
+			"content": self.content if self.content else None,
+			"created": self.created.strftime(time_fmt) if self.created else None,
+			"last_modified": self.last_modified.strftime(time_fmt) if self.last_modified else None,
+			"coords": "%s,%s" % (self.coords.lat, self.coords.lon) if self.coords else None}
+		return d
+
 class User(db.Model):
 	name = db.StringProperty(required = True)
 	pw_hash = db.StringProperty(required = True)
