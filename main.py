@@ -22,7 +22,7 @@ import webapp2
 app = webapp2.WSGIApplication([
 		("/", handlers.BlogHandler),
 		("/blog/?", handlers.BlogHandler),
-		("/blog.json", apihandlers.BlogAPI),
+		("/blog/.json", apihandlers.BlogAPI),
 		("/blog/newpost/?", handlers.NewPostHandler),
 		("/blog/([0-9]+)/?", handlers.PermalinkHandler),
 		("/blog/([0-9]+).json", apihandlers.PermalinkAPI),
