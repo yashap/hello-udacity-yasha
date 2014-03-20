@@ -19,8 +19,8 @@ class BlogAPI(handlers.Handler):
 			data.append({
 				"subject": p.subject if p.subject else None,
 				"content": p.content if p.content else None,
-				"created": p.created.strftime("%b %d %Y %H:%M:%S") if p.created else None,
-				"last_modified": p.last_modified.strftime("%b %d %Y %H:%M:%S") if p.last_modified else None,
+				"created": p.created.strftime("%Y-%m-%d %H:%M:%S") if p.created else None,
+				"last_modified": p.last_modified.strftime("%Y-%m-%d %H:%M:%S") if p.last_modified else None,
 				"coords": "%s,%s" % (p.coords.lat, p.coords.lon) if p.coords else None
 			})
 
@@ -43,8 +43,8 @@ class PermalinkAPI(handlers.Handler):
 		data = {
 			"subject": p.subject if p.subject else None,
 			"content": p.content if p.content else None,
-			"created": p.created.strftime("%b %d %Y %H:%M:%S") if p.created else None,
-			"last_modified": p.last_modified.strftime("%b %d %Y %H:%M:%S") if p.last_modified else None,
+			"created": p.created.strftime("%Y-%m-%d %H:%M:%S") if p.created else None,
+			"last_modified": p.last_modified.strftime("%Y-%m-%d %H:%M:%S") if p.last_modified else None,
 			"coords": "%s,%s" % (p.coords.lat, p.coords.lon) if p.coords else None
 		}
 
