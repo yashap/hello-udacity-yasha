@@ -1,6 +1,7 @@
 # !/usr/bin/env python
 
 import webapp2
+import json
 
 import functions
 import entities
@@ -25,8 +26,10 @@ class Handler(webapp2.RequestHandler):
 		self.write(self.render_str(template, **params))
 		# writes the rendered template
 
-	def render_json(self, **params):
-		
+	def render_json(self, d):
+		json_txt = json.dumps(d)
+		self.response.headers["Content-Type"] = "application/json; charset=UTF-8"
+		self.write(json_txt)
 
 	def set_secure_cookie(self, name, val):
 		cookie_val = functions.make_secure_val(val)
@@ -74,7 +77,7 @@ class Handler(webapp2.RequestHandler):
 		if self.request.url.endswith(".json"):
 			self.format = "json"
 		else:
-			self.format = "hmtl"
+			self.format = "html"
 
 
 # Handler for the page displaying posts
@@ -101,7 +104,12 @@ class BlogHandler(Handler):
 
 			self.render("blog.html", currentPosts=currentPosts, img_url=img_url)
 
-		elif self.format = "json":
+		elif self.format == "json":
+			return self.render_json([p.as_dict() for p in currentPosts])
+
+		else:
+			self.error(500)
+			return
 
 
 # Handler for permalinks to individual posts
@@ -124,7 +132,13 @@ class PermalinkHandler(Handler):
 		if point:
 			img_url = functions.gmaps_img([point])
 
-		self.render("permalink.html", currentPosts = [this_post], img_url=img_url)
+		if self.format == "html":
+			self.render("permalink.html", currentPosts = [this_post], img_url=img_url)
+		elif self.format == "json":
+			self.render_json(this_post.as_dict())
+		else:
+			self.error(500)
+			return
 
 # Handler for the page to submit posts
 ###############################
