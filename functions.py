@@ -8,9 +8,14 @@ import string
 import hashlib
 import re
 import urllib2
+import logging
+import datetime
+
+import entities
 
 from xml.dom import minidom
 from google.appengine.ext import db
+from google.appengine.api import memcache
 
 # Template boilerplate
 ###############################
@@ -124,3 +129,19 @@ GMAPS_URL = "http://maps.googleapis.com/maps/api/staticmap?size=500x500&sensor=f
 def gmaps_img(points):
 	markers = "&".join("markers=%s,%s" % (p.lat, p.lon) for p in points)
 	return GMAPS_URL + markers
+
+# memcache
+###############################
+def top_blogs(update = False):
+	blogs = memcache.get("top_blogs")
+	if blogs is None or update:
+		logging.error("DB QUERY")
+		posts = entities.db.GqlQuery("SELECT * "
+			"FROM BlogPost "
+			"ORDER BY created DESC "
+			"LIMIT 10")
+		posts = list(posts)
+		timestamp = datetime.datetime.now()
+		blogs = {"posts": posts, "timestamp": timestamp}
+		memcache.set("top_blogs", blogs)
+	return blogs

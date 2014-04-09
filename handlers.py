@@ -2,9 +2,11 @@
 
 import webapp2
 import json
+import datetime
 
 import functions
 import entities
+
 
 # General Handler class
 ###############################
@@ -84,13 +86,11 @@ class Handler(webapp2.RequestHandler):
 ###############################
 class BlogHandler(Handler):
 	def get(self):
-		currentPosts = entities.db.GqlQuery("SELECT * "
-			"FROM BlogPost "
-			"ORDER BY created DESC "
-			"LIMIT 10"
-			)
+		currentBlogs = functions.top_blogs()
 
-		currentPosts = list(currentPosts)
+		if currentBlogs:
+			currentPosts = currentBlogs["posts"]
+			secondsSince = "Page generated %s seconds ago" % int(round((datetime.datetime.now() - currentBlogs["timestamp"]).total_seconds()))
 
 		if self.format == "html":
 			points = []
@@ -102,7 +102,7 @@ class BlogHandler(Handler):
 			if points:
 				img_url = functions.gmaps_img(points)
 
-			self.render("blog.html", currentPosts=currentPosts, img_url=img_url)
+			self.render("blog.html", currentPosts=currentPosts, img_url=img_url, secondsSince = secondsSince)
 
 		elif self.format == "json":
 			return self.render_json([p.as_dict() for p in currentPosts])
@@ -161,6 +161,7 @@ class NewPostHandler(Handler):
 				if coords:
 					e.coords = coords
 				e.put()
+				functions.top_blogs(True)
 				this_id = str(e.key().id())
 
 				self.redirect("/blog/%s" % this_id)
