@@ -3,6 +3,7 @@
 import webapp2
 import json
 import datetime
+import time
 
 import functions
 import entities
@@ -164,6 +165,7 @@ class NewPostHandler(Handler):
 				if coords:
 					e.coords = coords
 				e.put()
+				time.sleep(0.1)
 				functions.top_blogs(True)
 				this_id = str(e.key().id())
 
