@@ -145,3 +145,14 @@ def top_blogs(update = False):
 		blogs = {"posts": posts, "timestamp": timestamp}
 		memcache.set("top_blogs", blogs)
 	return blogs
+
+def perma_link(post_id):
+	str_id = str(post_id)
+	post = memcache.get(str_id)
+	if not post:
+		logging.error("DB QUERY")
+		post = entities.BlogPost.get_by_id(int(str_id), parent=blog_key())
+		timestamp = datetime.datetime.now()
+		post = {"post": post, "timestamp": timestamp}
+		memcache.set(str_id, post)
+	return post

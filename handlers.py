@@ -90,7 +90,7 @@ class BlogHandler(Handler):
 
 		if currentBlogs:
 			currentPosts = currentBlogs["posts"]
-			secondsSince = "Page generated %s seconds ago" % int(round((datetime.datetime.now() - currentBlogs["timestamp"]).total_seconds()))
+			secondsSince = "Queried %s seconds ago" % int(round((datetime.datetime.now() - currentBlogs["timestamp"]).total_seconds()))
 
 		if self.format == "html":
 			points = []
@@ -118,7 +118,10 @@ class PermalinkHandler(Handler):
 	def get(self, post_id):
 		# look at how we set up the mapping
 		# 	post_id is automatically passed to the handler
-		this_post = entities.BlogPost.get_by_id(int(post_id), parent=functions.blog_key())
+		post = functions.perma_link(post_id)
+		if post:
+			this_post = post["post"]
+			secondsSince = "Queried %s seconds ago" % int(round((datetime.datetime.now() - post["timestamp"]).total_seconds()))
 
 		if not this_post:
 			self.error(404)
@@ -133,7 +136,7 @@ class PermalinkHandler(Handler):
 			img_url = functions.gmaps_img([point])
 
 		if self.format == "html":
-			self.render("permalink.html", currentPosts = [this_post], img_url=img_url)
+			self.render("permalink.html", currentPosts = [this_post], img_url=img_url, secondsSince = secondsSince)
 		elif self.format == "json":
 			self.render_json(this_post.as_dict())
 		else:
