@@ -10,6 +10,7 @@ import re
 import urllib2
 import logging
 import datetime
+import time
 
 import entities
 
@@ -136,6 +137,8 @@ def top_blogs(update = False):
 	blogs = memcache.get("top_blogs")
 	if blogs is None or update:
 		logging.error("DB QUERY")
+		if update:
+			time.sleep(0.1)
 		posts = entities.db.GqlQuery("SELECT * "
 			"FROM BlogPost "
 			"ORDER BY created DESC "

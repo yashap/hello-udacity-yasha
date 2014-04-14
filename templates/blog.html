@@ -12,7 +12,10 @@
 		{% for currentPost in currentPosts %}
 			<div class="entry">
 				<div class="row">
-					<div class="col-sm-8 entry-title">{{currentPost.subject}}</div>
+					<div class="col-sm-8 entry-title">
+						{% set link = "/blog/" ~ currentPost.key().id() %}
+						<a href={{link}}>{{currentPost.subject}}</a>
+					</div>
 					<div class="col-sm-4 entry-created">{{currentPost.created.strftime("%b %d, %Y")}}</div>
 				</div>
 				<pre class="entry-body">{{currentPost.content}}</pre>
