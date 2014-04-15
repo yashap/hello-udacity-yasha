@@ -133,9 +133,23 @@ def gmaps_img(points):
 
 # memcache
 ###############################
+def age_set(key, val):
+	save_time = datetime.datetime.utcnow()
+	memcache.set(key, (val, save_time))
+
+def age_get(key):
+	r = memcache.get(key)
+	if r:
+		val, save_time = r
+		age = (datetime.datetime.utcnow() - save_time).total_seconds()
+	else:
+		val, age = None, 0
+	return val, age
+
 def top_blogs(update = False):
-	blogs = memcache.get("top_blogs")
-	if blogs is None or update:
+	mc_key = "top_blogs"
+	posts, age = age_get(mc_key)
+	if posts is None or update:
 		logging.error("DB QUERY")
 		if update:
 			time.sleep(0.1)
@@ -144,18 +158,21 @@ def top_blogs(update = False):
 			"ORDER BY created DESC "
 			"LIMIT 10")
 		posts = list(posts)
-		timestamp = datetime.datetime.now()
-		blogs = {"posts": posts, "timestamp": timestamp}
-		memcache.set("top_blogs", blogs)
-	return blogs
+		age_set(mc_key, posts)
+	return posts, age
 
 def perma_link(post_id):
-	str_id = str(post_id)
-	post = memcache.get(str_id)
+	mc_key = str(post_id)
+	post, age = age_get(mc_key)
 	if not post:
 		logging.error("DB QUERY")
-		post = entities.BlogPost.get_by_id(int(str_id), parent=blog_key())
-		timestamp = datetime.datetime.now()
-		post = {"post": post, "timestamp": timestamp}
-		memcache.set(str_id, post)
-	return post
+		post = entities.BlogPost.get_by_id(int(mc_key), parent=blog_key())
+		age_set(mc_key, post)
+	return post, age
+
+def age_str(age):
+	s = "Queried %s seconds ago"
+	age = int(age)
+	if age == 1:
+		s = s.replace("seconds", "second")
+	return s % age

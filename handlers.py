@@ -91,8 +91,8 @@ class BlogHandler(Handler):
 		currentBlogs = functions.top_blogs()
 
 		if currentBlogs:
-			currentPosts = currentBlogs["posts"]
-			secondsSince = "Queried %s seconds ago" % int(round((datetime.datetime.now() - currentBlogs["timestamp"]).total_seconds()))
+			currentPosts, age = currentBlogs
+			secondsSince = functions.age_str(age)
 
 		if self.format == "html":
 			points = []
@@ -118,29 +118,28 @@ class BlogHandler(Handler):
 ###############################
 class PermalinkHandler(Handler):
 	def get(self, post_id):
-		# look at how we set up the mapping
-		# 	post_id is automatically passed to the handler
-		post = functions.perma_link(post_id)
-		if post:
-			this_post = post["post"]
-			secondsSince = "Queried %s seconds ago" % int(round((datetime.datetime.now() - post["timestamp"]).total_seconds()))
+		# in main.py, post_id is automatically passed to the handler
+		content = functions.perma_link(post_id)
+		if content:
+			post, age = content
+			secondsSince = functions.age_str(age)
 
-		if not this_post:
+		if not content:
 			self.error(404)
 			return
 
 		point = None
-		if this_post.coords:
-			point = this_post.coords
+		if post.coords:
+			point = post.coords
 
 		img_url = None
 		if point:
 			img_url = functions.gmaps_img([point])
 
 		if self.format == "html":
-			self.render("permalink.html", currentPosts = [this_post], img_url=img_url, secondsSince = secondsSince)
+			self.render("permalink.html", currentPosts = [post], img_url=img_url, secondsSince = secondsSince)
 		elif self.format == "json":
-			self.render_json(this_post.as_dict())
+			self.render_json(post.as_dict())
 		else:
 			self.error(500)
 			return
@@ -161,7 +160,6 @@ class NewPostHandler(Handler):
 			coords = functions.get_coords(self.request.remote_addr)
 
 			if subject and content:
-				# if they entered a subject and content
 				e = entities.BlogPost(parent = functions.blog_key(), subject=subject, content=content)
 				if coords:
 					e.coords = coords
